@@ -248,7 +248,7 @@ class Customer_Window:
         my_cursor.execute('select * from customer')
         rows = my_cursor.fetchall()
         if len(rows) != 0:
-            self.Cust_Details_Table.delete(self.Cust_Details_Table.get_children())
+            self.Cust_Details_Table.delete(*self.Cust_Details_Table.get_children())
             for i in rows:
                 self.Cust_Details_Table.insert("", END, values=i)
 

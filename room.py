@@ -1,8 +1,10 @@
+import smtplib
+from email.message import EmailMessage
 from tkinter import *
 from pil import Image, ImageTk
 from tkinter import ttk
 import random
-from time import strptime
+from time import strftime
 from datetime import datetime
 import mysql.connector
 from tkinter import messagebox
@@ -69,10 +71,10 @@ class Room_Booking:
         # Check_out Date
         check_out_date = Label(labelframeleft, text="Check_out Date:",
                               font=("arial", 12, "bold"), padx=2, pady=6)
-        check_out_date.grid(row=1, column=0, sticky=W)
+        check_out_date.grid(row=2, column=0, sticky=W)
 
         txtcheck_out_date = ttk.Entry(labelframeleft, textvariable=self.var_checkout, width=29, font=("arial", 13, "bold"))
-        txtcheck_out_date.grid(row=1, column=1)
+        txtcheck_out_date.grid(row=2, column=1)
 
         # Room Type
         label_RoomType = Label(labelframeleft, font=("arial", 12, "bold"), text="Room Type:", padx=2, pady=6)
@@ -280,12 +282,12 @@ class Room_Booking:
         content = self.room_table.item(cursor_row)
         row = content["values"]
 
-        self.var_contact.set(row[0]),
-        self.var_checkin.set(row[1]),
-        self.var_checkout.set(row[2]),
-        self.var_roomtype.set(row[3]),
-        self.var_roomavailable.set(row[4]),
-        self.var_meal.set(row[5]),
+        self.var_contact.set(row[0])
+        self.var_checkin.set(row[1])
+        self.var_checkout.set(row[2])
+        self.var_roomtype.set(row[3])
+        self.var_roomavailable.set(row[4])
+        self.var_meal.set(row[5])
         self.var_noofdays.set(row[6])
 
 
@@ -298,7 +300,7 @@ class Room_Booking:
         else:
             conn = mysql.connector.connect(host="localhost", username="root", password="", database="ayush_hotels")
             my_cursor = conn.cursor()
-            my_cursor.execute('update room set check_in=%s, check_out=%s, roomtype=%s, roomavailable=%s, meal=%s, noOfdays=%s where Contact=%s', (
+            my_cursor.execute('update room set check_in=%s, check_out=%s, roomtype=%s, Room=%s, meal=%s, noOfdays=%s where Contact=%s', (
 
 
                 self.var_checkin.get(),
@@ -401,7 +403,7 @@ class Room_Booking:
                 lbl3 = Label(showDataFrame, text=row, font=("arial", 12, "bold"))
                 lbl3.place(x=90, y=60)
 
-                # ======================Gender========================
+                # ======================Nationality========================
                 conn = mysql.connector.connect(host="localhost", username="root", password="", database="ayush_hotels")
                 my_cursor = conn.cursor()
                 query = ("select Nationality from customer where Mobile=%s")
@@ -415,7 +417,7 @@ class Room_Booking:
                 lbl4 = Label(showDataFrame, text=row, font=("arial", 12, "bold"))
                 lbl4.place(x=90, y=90)
 
-                # ======================Gender========================
+                # ======================Address========================
                 conn = mysql.connector.connect(host="localhost", username="root", password="", database="ayush_hotels")
                 my_cursor = conn.cursor()
                 query = ("select Address from customer where Mobile=%s")
@@ -448,8 +450,8 @@ class Room_Booking:
     def total(self):
         inDate = self.var_checkin.get()
         outDate = self.var_checkout.get()
-        inDate = datetime.strptime(inDate, "%d/%m/%y")
-        outDate = datetime.strptime(outDate, "%d/%m/%y")
+        inDate = datetime.strptime(inDate, "%d/%m/%Y")
+        outDate = datetime.strptime(outDate, "%d/%m/%Y")
         self.var_noofdays.set(abs(outDate - inDate).days)
 
         if (self.var_meal.get() == "Breakfast" and self.var_roomtype.get() == "Luxury"):
@@ -569,6 +571,23 @@ class Room_Booking:
             self.var_paidtax.set(Tax)
             self.var_actualtotal.set(ST)
             self.var_total.set(TT)
+
+        conn = mysql.connector.connect(host="localhost", username="root", password="", database="ayush_hotels")
+        my_cursor = conn.cursor()
+        my_cursor.execute('insert into bill values(%s, %s, %s, %s)', (
+            self.var_contact.get(),
+            self.var_paidtax.get(),
+            self.var_actualtotal.get(),
+            self.var_total.get()
+        ))
+
+        conn.commit()
+        self.fetch_data()
+        conn.close()
+        messagebox.showinfo("Success", "Bill Added.")
+
+
+
 
 
 if __name__ == '__main__':
